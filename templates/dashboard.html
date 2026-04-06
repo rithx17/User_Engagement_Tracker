@@ -6,18 +6,19 @@
 
 {% block content %}
 <main class="dashboard-layout">
-    <section class="dashboard-hero dashboard-shell">
+    <section class="dashboard-shell dashboard-hero">
         <div>
-            <div class="eyebrow">LIVE ANALYTICS OVERVIEW</div>
+            <div class="eyebrow">PRODUCTION ANALYTICS DASHBOARD</div>
             <h1>Welcome back, {{ user }}.</h1>
             <p>
-                Monitor registrations, login activity, and dashboard visits from one
-                production-ready workspace with cleaner session controls and audit visibility.
+                Your engagement workspace is live with database-backed logs, auto-refreshing
+                charts, real activity summaries, and session-protected analytics.
             </p>
         </div>
 
         <div class="hero-actions dashboard-actions">
-            <a class="button button-secondary" href="{{ url_for('api_stats') }}">View Stats API</a>
+            <div class="live-status" id="liveStatus">Live sync</div>
+            <a class="button button-secondary" href="{{ url_for('api_stats') }}">Open Stats API</a>
             <a class="button button-primary" href="{{ url_for('logout') }}">Logout</a>
         </div>
     </section>
@@ -26,22 +27,22 @@
         <article class="stat-card stat-card-accent">
             <div class="stat-icon" aria-hidden="true">👥</div>
             <span class="stat-label">Total Users</span>
-            <strong>{{ stats.total_users }}</strong>
-            <p>All registered accounts currently stored in the local SQLite database.</p>
+            <strong id="stat-total-users">{{ dashboard_data.stats.total_users }}</strong>
+            <p>Registered accounts currently available in the SQLite analytics store.</p>
         </article>
 
         <article class="stat-card">
             <div class="stat-icon" aria-hidden="true">🔐</div>
             <span class="stat-label">Total Logins</span>
-            <strong>{{ stats.total_logins }}</strong>
-            <p>Successful sign-ins tracked through the new analytics event log.</p>
+            <strong id="stat-total-logins">{{ dashboard_data.stats.total_logins }}</strong>
+            <p>Successful sign-ins captured through event logging and session-aware auth.</p>
         </article>
 
         <article class="stat-card">
-            <div class="stat-icon" aria-hidden="true">📈</div>
+            <div class="stat-icon" aria-hidden="true">📊</div>
             <span class="stat-label">Total Visits</span>
-            <strong>{{ stats.total_visits }}</strong>
-            <p>Dashboard page visits captured for session-aware engagement reporting.</p>
+            <strong id="stat-total-visits">{{ dashboard_data.stats.total_visits }}</strong>
+            <p>Protected dashboard visits tracked for product usage and retention visibility.</p>
         </article>
     </section>
 
@@ -49,7 +50,7 @@
         <article class="dashboard-panel analytics-panel">
             <div class="panel-header">
                 <div>
-                    <span class="eyebrow">ACTIVITY TREND</span>
+                    <span class="eyebrow">RECENT ACTIVITY</span>
                     <h2>User activity over time</h2>
                 </div>
                 <span class="badge badge-muted">Last 7 days</span>
@@ -57,21 +58,64 @@
 
             <div class="chart-wrap">
                 <canvas id="activityChart" aria-label="User activity line chart"></canvas>
+                <div class="chart-loader" id="activityLoader">Refreshing chart…</div>
             </div>
         </article>
 
+        <article class="dashboard-panel analytics-panel">
+            <div class="panel-header">
+                <div>
+                    <span class="eyebrow">LOGIN FREQUENCY</span>
+                    <h2>Login trend by day</h2>
+                </div>
+                <span class="badge badge-muted">Behavior snapshot</span>
+            </div>
+
+            <div class="chart-wrap">
+                <canvas id="loginChart" aria-label="Login frequency bar chart"></canvas>
+                <div class="chart-loader" id="loginLoader">Refreshing chart…</div>
+            </div>
+        </article>
+    </section>
+
+    <section class="dashboard-content-grid">
         <article class="dashboard-panel insights-panel">
             <div class="panel-header">
                 <div>
-                    <span class="eyebrow">TRACKING EVENTS</span>
-                    <h2>What gets logged</h2>
+                    <span class="eyebrow">INSIGHTS</span>
+                    <h2>High-level signals</h2>
                 </div>
             </div>
 
-            <div class="check-list">
-                <div><strong>Registration</strong><span>Every new account writes a user registration event.</span></div>
-                <div><strong>Login</strong><span>Successful authentication writes a user login event.</span></div>
-                <div><strong>Dashboard visit</strong><span>Each protected dashboard visit writes a page visit event.</span></div>
+            <div class="insights-grid">
+                <div class="insight-card">
+                    <span class="insight-label">Most Active User</span>
+                    <strong id="insight-most-active">{{ dashboard_data.insights.most_active_user }}</strong>
+                    <p id="insight-most-active-count">{{ dashboard_data.insights.most_active_count }} tracked actions</p>
+                </div>
+                <div class="insight-card">
+                    <span class="insight-label">Peak Login Time</span>
+                    <strong id="insight-peak-login">{{ dashboard_data.insights.peak_login_time }}</strong>
+                    <p>Approximate hour with the strongest login activity.</p>
+                </div>
+            </div>
+        </article>
+
+        <article class="dashboard-panel recent-panel">
+            <div class="panel-header">
+                <div>
+                    <span class="eyebrow">RECENT ACTIVITY</span>
+                    <h2>Daily totals</h2>
+                </div>
+            </div>
+
+            <div class="activity-feed" id="recentActivityFeed">
+                {% for item in dashboard_data.stats.recent_activity %}
+                    <div class="activity-feed-row">
+                        <span>{{ item.label }}</span>
+                        <strong>{{ item.value }} actions</strong>
+                    </div>
+                {% endfor %}
             </div>
         </article>
     </section>
@@ -79,8 +123,8 @@
     <section class="dashboard-panel logs-panel">
         <div class="panel-header">
             <div>
-                <span class="eyebrow">RECENT LOGS</span>
-                <h2>Latest activity feed</h2>
+                <span class="eyebrow">ACTIVITY LOG TABLE</span>
+                <h2>Latest 10 events</h2>
             </div>
         </div>
 
@@ -93,9 +137,9 @@
                         <th>Timestamp</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {% if recent_logs %}
-                        {% for log in recent_logs %}
+                <tbody id="logsTableBody">
+                    {% if dashboard_data.recent_logs %}
+                        {% for log in dashboard_data.recent_logs %}
                             <tr>
                                 <td>{{ log.username }}</td>
                                 <td><span class="table-pill">{{ log.action }}</span></td>
@@ -112,57 +156,10 @@
         </div>
     </section>
 </main>
+{% endblock %}
 
+{% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const activityLabels = {{ activity_labels | tojson }};
-    const activityValues = {{ activity_values | tojson }};
-
-    const chartContext = document.getElementById("activityChart");
-    if (chartContext) {
-        new Chart(chartContext, {
-            type: "line",
-            data: {
-                labels: activityLabels,
-                datasets: [{
-                    label: "Tracked actions",
-                    data: activityValues,
-                    borderColor: "#0f766e",
-                    backgroundColor: "rgba(15, 118, 110, 0.12)",
-                    tension: 0.35,
-                    fill: true,
-                    borderWidth: 3,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    pointBackgroundColor: "#0f766e"
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: {
-                            color: "rgba(31, 37, 32, 0.06)"
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        },
-                        grid: {
-                            color: "rgba(31, 37, 32, 0.08)"
-                        }
-                    }
-                }
-            }
-        });
-    }
-</script>
+<script id="dashboardBootstrap" type="application/json">{{ dashboard_data | tojson }}</script>
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
 {% endblock %}
