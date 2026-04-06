@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}User Engagement Tracker{% endblock %}
+
+{% block body_class %}landing-page{% endblock %}
+
+{% block content %}
+<main class="hero-layout">
+    <section class="hero-panel">
+        <div class="eyebrow">ENGAGEMENT ANALYTICS PLATFORM</div>
+        <h1>
+            Measure user activity with a dashboard that feels built for teams,
+            not templates.
+        </h1>
+        <p class="hero-copy">
+            User Engagement Tracker helps you keep onboarding, login activity,
+            and session visibility in one focused workspace with a cleaner,
+            more credible interface.
+        </p>
+
+        <div class="hero-actions">
+            <a class="button button-primary" href="{{ url_for('register') }}">Create account</a>
+            <a class="button button-secondary" href="{{ url_for('login') }}">Sign in</a>
+        </div>
+
+        <div class="metric-strip">
+            <article>
+                <strong>Focused UX</strong>
+                <span>Editorial layout, layered surfaces, and stronger typography.</span>
+            </article>
+            <article>
+                <strong>Fast onboarding</strong>
+                <span>Register, login, and land in a dashboard with less friction.</span>
+            </article>
+            <article>
+                <strong>Ready to evolve</strong>
+                <span>A reusable base template and shared design system.</span>
+            </article>
+        </div>
+    </section>
+
+    <aside class="showcase-card">
+        <div class="showcase-header">
+            <span class="badge">Live workspace</span>
+            <span class="badge badge-muted">Modernized UI</span>
+        </div>
+
+        <div class="showcase-graph">
+            <div class="graph-line"></div>
+            <div class="graph-points">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+        <div class="showcase-list">
+            <div>
+                <span>Session visibility</span>
+                <strong>Structured dashboard</strong>
+            </div>
+            <div>
+                <span>Authentication views</span>
+                <strong>Unified visual language</strong>
+            </div>
+            <div>
+                <span>Frontend direction</span>
+                <strong>Professional, not generic</strong>
+            </div>
+        </div>
+    </aside>
+</main>
+{% endblock %}

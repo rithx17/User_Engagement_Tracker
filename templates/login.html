@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Login | User Engagement Tracker{% endblock %}
+
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+<main class="auth-layout">
+    <section class="auth-copy">
+        <div class="eyebrow">WELCOME BACK</div>
+        <h1>Access your engagement workspace.</h1>
+        <p>
+            Sign in to review user activity with a calmer, more product-ready
+            interface built to feel trustworthy from the first click.
+        </p>
+    </section>
+
+    <section class="auth-card">
+        <div class="card-heading">
+            <h2>User Login</h2>
+            <p>Enter your credentials to continue.</p>
+        </div>
+
+        <form method="post" class="auth-form">
+            <label for="username">Username</label>
+            <input id="username" type="text" name="username" placeholder="Enter your username" required>
+
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" placeholder="Enter your password" required>
+
+            <button class="button button-primary button-block" type="submit">Login</button>
+        </form>
+
+        <p class="form-footnote">
+            New user?
+            <a href="{{ url_for('register') }}">Create an account</a>
+        </p>
+    </section>
+</main>
+{% endblock %}

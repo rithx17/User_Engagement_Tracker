@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | User Engagement Tracker{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block content %}
+<main class="dashboard-layout">
+    <section class="dashboard-hero">
+        <div>
+            <div class="eyebrow">CONTROL CENTER</div>
+            <h1>Welcome back, {{ user }}.</h1>
+            <p>
+                Your workspace is active and ready. This refreshed dashboard is
+                designed to feel structured, premium, and easier to build on.
+            </p>
+        </div>
+
+        <a class="button button-secondary" href="{{ url_for('logout') }}">Logout</a>
+    </section>
+
+    <section class="dashboard-grid">
+        <article class="stat-card stat-card-accent">
+            <span class="stat-label">Workspace status</span>
+            <strong>Active</strong>
+            <p>Authentication is working and your session is currently live.</p>
+        </article>
+
+        <article class="stat-card">
+            <span class="stat-label">Current user</span>
+            <strong>{{ user }}</strong>
+            <p>Signed in successfully and connected to the dashboard.</p>
+        </article>
+
+        <article class="stat-card">
+            <span class="stat-label">Interface direction</span>
+            <strong>Modernized</strong>
+            <p>Sharper hierarchy, softer surfaces, and more intentional spacing.</p>
+        </article>
+    </section>
+
+    <section class="dashboard-panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">NEXT STEP</span>
+                <h2>Ready for engagement insights</h2>
+            </div>
+        </div>
+
+        <div class="panel-content">
+            <p>
+                The UI foundation is now in a stronger place for adding real
+                charts, visit logs, and retention metrics without redesigning
+                everything later.
+            </p>
+
+            <div class="check-list">
+                <div>Reusable base template for consistent screens</div>
+                <div>Styled authentication flow with clearer feedback</div>
+                <div>Professional dashboard shell for future analytics</div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

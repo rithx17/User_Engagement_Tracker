@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Register | User Engagement Tracker{% endblock %}
+
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+<main class="auth-layout">
+    <section class="auth-copy">
+        <div class="eyebrow">NEW ACCOUNT</div>
+        <h1>Set up a cleaner admin entry point for your team.</h1>
+        <p>
+            Create a profile and start from a sharper interface that feels
+            closer to a real product dashboard than a starter template.
+        </p>
+    </section>
+
+    <section class="auth-card">
+        <div class="card-heading">
+            <h2>User Registration</h2>
+            <p>Create your account to begin tracking engagement.</p>
+        </div>
+
+        <form method="post" class="auth-form">
+            <label for="username">Username</label>
+            <input id="username" type="text" name="username" placeholder="Choose a username" required>
+
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" placeholder="Create a password" required>
+
+            <button class="button button-primary button-block" type="submit">Register</button>
+        </form>
+
+        <p class="form-footnote">
+            Already have an account?
+            <a href="{{ url_for('login') }}">Login here</a>
+        </p>
+    </section>
+</main>
+{% endblock %}
