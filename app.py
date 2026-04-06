@@ -14,6 +14,7 @@ from flask_jwt_extended import (
     jwt_required,
 )
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import func, inspect, text
 from sqlalchemy.orm import joinedload
 
@@ -21,6 +22,7 @@ from sqlalchemy.orm import joinedload
 BASE_DIR = Path(__file__).resolve().parent
 LEGACY_DATABASE_PATH = BASE_DIR / "users.db"
 DATABASE_PATH = Path(os.environ.get("DATABASE_PATH", BASE_DIR / "database.db"))
+DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-change-me")
@@ -194,10 +196,15 @@ def set_session_user(user):
 
 def create_log_entry(user, action):
     log = Log(user_id=user.id, action=action, timestamp=datetime.now(timezone.utc))
-    db.session.add(log)
-    db.session.commit()
-    app.logger.info("Tracked action '%s' for user '%s'", action, user.username)
-    return log
+    try:
+        db.session.add(log)
+        db.session.commit()
+        app.logger.info("Tracked action '%s' for user '%s'", action, user.username)
+        return log
+    except SQLAlchemyError as error:
+        db.session.rollback()
+        app.logger.exception("Failed to create log entry '%s' for '%s': %s", action, user.username, error)
+        return None
 
 
 def register_user(username, password):
@@ -210,8 +217,16 @@ def register_user(username, password):
 
     password_hash = bcrypt.generate_password_hash(validated_password).decode("utf-8")
     user = User(username=normalized_username, password_hash=password_hash)
-    db.session.add(user)
-    db.session.commit()
+    try:
+        db.session.add(user)
+        db.session.commit()
+    except SQLAlchemyError as error:
+        db.session.rollback()
+        app.logger.exception("Failed to register user '%s': %s", normalized_username, error)
+        raise APIError(
+            "Database write failed. If this is deployed on Render, set DATABASE_PATH to /var/data/database.db and attach a disk.",
+            500,
+        ) from error
     create_log_entry(user, "user registration")
     return user
 
