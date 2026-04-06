@@ -6,60 +6,163 @@
 
 {% block content %}
 <main class="dashboard-layout">
-    <section class="dashboard-hero">
+    <section class="dashboard-hero dashboard-shell">
         <div>
-            <div class="eyebrow">CONTROL CENTER</div>
+            <div class="eyebrow">LIVE ANALYTICS OVERVIEW</div>
             <h1>Welcome back, {{ user }}.</h1>
             <p>
-                Your workspace is active and ready. This refreshed dashboard is
-                designed to feel structured, premium, and easier to build on.
+                Monitor registrations, login activity, and dashboard visits from one
+                production-ready workspace with cleaner session controls and audit visibility.
             </p>
         </div>
 
-        <a class="button button-secondary" href="{{ url_for('logout') }}">Logout</a>
+        <div class="hero-actions dashboard-actions">
+            <a class="button button-secondary" href="{{ url_for('api_stats') }}">View Stats API</a>
+            <a class="button button-primary" href="{{ url_for('logout') }}">Logout</a>
+        </div>
     </section>
 
     <section class="dashboard-grid">
         <article class="stat-card stat-card-accent">
-            <span class="stat-label">Workspace status</span>
-            <strong>Active</strong>
-            <p>Authentication is working and your session is currently live.</p>
+            <div class="stat-icon" aria-hidden="true">👥</div>
+            <span class="stat-label">Total Users</span>
+            <strong>{{ stats.total_users }}</strong>
+            <p>All registered accounts currently stored in the local SQLite database.</p>
         </article>
 
         <article class="stat-card">
-            <span class="stat-label">Current user</span>
-            <strong>{{ user }}</strong>
-            <p>Signed in successfully and connected to the dashboard.</p>
+            <div class="stat-icon" aria-hidden="true">🔐</div>
+            <span class="stat-label">Total Logins</span>
+            <strong>{{ stats.total_logins }}</strong>
+            <p>Successful sign-ins tracked through the new analytics event log.</p>
         </article>
 
         <article class="stat-card">
-            <span class="stat-label">Interface direction</span>
-            <strong>Modernized</strong>
-            <p>Sharper hierarchy, softer surfaces, and more intentional spacing.</p>
+            <div class="stat-icon" aria-hidden="true">📈</div>
+            <span class="stat-label">Total Visits</span>
+            <strong>{{ stats.total_visits }}</strong>
+            <p>Dashboard page visits captured for session-aware engagement reporting.</p>
         </article>
     </section>
 
-    <section class="dashboard-panel">
+    <section class="dashboard-content-grid">
+        <article class="dashboard-panel analytics-panel">
+            <div class="panel-header">
+                <div>
+                    <span class="eyebrow">ACTIVITY TREND</span>
+                    <h2>User activity over time</h2>
+                </div>
+                <span class="badge badge-muted">Last 7 days</span>
+            </div>
+
+            <div class="chart-wrap">
+                <canvas id="activityChart" aria-label="User activity line chart"></canvas>
+            </div>
+        </article>
+
+        <article class="dashboard-panel insights-panel">
+            <div class="panel-header">
+                <div>
+                    <span class="eyebrow">TRACKING EVENTS</span>
+                    <h2>What gets logged</h2>
+                </div>
+            </div>
+
+            <div class="check-list">
+                <div><strong>Registration</strong><span>Every new account writes a user registration event.</span></div>
+                <div><strong>Login</strong><span>Successful authentication writes a user login event.</span></div>
+                <div><strong>Dashboard visit</strong><span>Each protected dashboard visit writes a page visit event.</span></div>
+            </div>
+        </article>
+    </section>
+
+    <section class="dashboard-panel logs-panel">
         <div class="panel-header">
             <div>
-                <span class="eyebrow">NEXT STEP</span>
-                <h2>Ready for engagement insights</h2>
+                <span class="eyebrow">RECENT LOGS</span>
+                <h2>Latest activity feed</h2>
             </div>
         </div>
 
-        <div class="panel-content">
-            <p>
-                The UI foundation is now in a stronger place for adding real
-                charts, visit logs, and retention metrics without redesigning
-                everything later.
-            </p>
-
-            <div class="check-list">
-                <div>Reusable base template for consistent screens</div>
-                <div>Styled authentication flow with clearer feedback</div>
-                <div>Professional dashboard shell for future analytics</div>
-            </div>
+        <div class="table-wrap">
+            <table class="logs-table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Action</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if recent_logs %}
+                        {% for log in recent_logs %}
+                            <tr>
+                                <td>{{ log.username }}</td>
+                                <td><span class="table-pill">{{ log.action }}</span></td>
+                                <td>{{ log.timestamp }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="3" class="empty-state">No activity has been logged yet.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
         </div>
     </section>
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const activityLabels = {{ activity_labels | tojson }};
+    const activityValues = {{ activity_values | tojson }};
+
+    const chartContext = document.getElementById("activityChart");
+    if (chartContext) {
+        new Chart(chartContext, {
+            type: "line",
+            data: {
+                labels: activityLabels,
+                datasets: [{
+                    label: "Tracked actions",
+                    data: activityValues,
+                    borderColor: "#0f766e",
+                    backgroundColor: "rgba(15, 118, 110, 0.12)",
+                    tension: 0.35,
+                    fill: true,
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: "#0f766e"
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: "rgba(31, 37, 32, 0.06)"
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        },
+                        grid: {
+                            color: "rgba(31, 37, 32, 0.08)"
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
 {% endblock %}
