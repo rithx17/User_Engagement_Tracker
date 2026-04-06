@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: user-engagement-tracker-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: CLIENT_URL
+        value: https://your-frontend-service.onrender.com
+      - key: JWT_SECRET
+        sync: false
+      - key: COOKIE_SECURE
+        value: true
+      - key: USE_INMEMORY_DB
+        value: true
+      - key: AUTO_DEMO_SEED
+        value: true
+  - type: static
+    name: user-engagement-tracker-frontend
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://your-backend-service.onrender.com/api

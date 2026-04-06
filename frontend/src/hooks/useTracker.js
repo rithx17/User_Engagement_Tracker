@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { API_BASE_URL } from '../config/api';
 import { eventService } from '../services/eventService';
 
 function getSessionId() {
@@ -106,7 +107,7 @@ export function useTracker(user) {
 
       if (window.navigator.sendBeacon) {
         window.navigator.sendBeacon(
-          `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/events/track`,
+          `${API_BASE_URL}/events/track`,
           new window.Blob([payload], { type: 'application/json' })
         );
         return;

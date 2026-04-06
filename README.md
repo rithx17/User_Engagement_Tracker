@@ -1,18 +1,17 @@
 # User Engagement Tracker
 
-User Engagement Tracker is a Flask-based full-stack analytics system built for academic review and deployment demos. It combines REST APIs, JWT authentication, CRUD operations, SQLite analytics, responsive dashboards, and documentation in a single Render-ready project.
+User Engagement Tracker currently contains two codepaths:
 
-## Live URL
-- Expected Render URL: `https://user-engagement-tracker.onrender.com`
-- Health check: `https://user-engagement-tracker.onrender.com/api/health`
+- Legacy Flask app at the repo root
+- Active full-stack app with React frontend in [`frontend/`](/Users/surya/portfolio/user-engagement-tracker/frontend) and Express backend in [`backend/`](/Users/surya/portfolio/user-engagement-tracker/backend)
 
-## Tech Stack
-- Backend: Flask, SQLAlchemy ORM, Flask-JWT-Extended, Flask-Bcrypt
-- Frontend: Jinja templates, vanilla JavaScript, Chart.js, custom CSS
-- Database: SQLite
-- Testing: Pytest
-- Deployment: Render
-- CI: GitHub Actions
+For frontend/backend integration and Render deployment, use the React + Express stack.
+
+## Active Stack
+- Frontend: React, Vite, React Router, Recharts
+- Backend: Express, JWT auth, cookie auth, analytics/admin APIs
+- Data: in-memory demo DB by default, optional MongoDB
+- Deployment: Render static site + Render web service
 
 ## Features
 - JWT-based authentication for REST APIs
@@ -28,148 +27,77 @@ User Engagement Tracker is a Flask-based full-stack analytics system built for a
 ## Project Structure
 ```text
 user-engagement-tracker/
-├── app.py
-├── database.db
-├── requirements.txt
+├── backend/
+├── frontend/
+├── render.fullstack.yaml
 ├── render.yaml
-├── templates/
-│   ├── base.html
-│   ├── home.html
-│   ├── login.html
-│   ├── register.html
-│   ├── dashboard.html
-│   └── user_management.html
-├── static/
-│   ├── auth.js
-│   ├── common.js
-│   ├── dashboard.js
-│   ├── users.js
-│   └── style.css
-├── tests/
-│   └── test_app.py
-├── docs/
-│   └── postman_collection.json
-└── .github/workflows/python-ci.yml
+└── app.py
 ```
 
-## Setup
-1. Create and activate a virtual environment.
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Copy environment variables:
-   ```bash
-   cp .env.example .env
-   ```
-4. Run the app locally:
-   ```bash
-   gunicorn app:app
-   ```
-   Or for development:
-   ```bash
-   python app.py
-   ```
+## Local Development
 
-## Environment Variables
-- `SECRET_KEY`: Flask session secret
-- `JWT_SECRET_KEY`: JWT signing secret
-- `DATABASE_PATH`: SQLite path, defaults to `database.db`
-- `PORT`: Flask/Gunicorn port
-- `COOKIE_SECURE`: `true` in production behind HTTPS
+Backend:
 
-## REST API Endpoints
+```bash
+cd backend
+cp .env.example .env
+npm install
+npm start
+```
 
-### Auth
-- `POST /api/register`
-- `POST /api/login`
+Frontend:
 
-### Users
-- `GET /api/users`
-- `GET /api/users/<id>`
-- `PUT /api/users/<id>`
-- `DELETE /api/users/<id>`
+```bash
+cd frontend
+cp .env.example .env
+npm install
+npm run dev
+```
 
-### Logs
-- `GET /api/logs`
-- `POST /api/logs`
+Notes:
 
-### Stats
-- `GET /api/stats`
+- Frontend dev server runs on `http://localhost:5173`
+- Backend runs on `http://127.0.0.1:5050`
+- Vite now proxies `/api` to the backend in development
+- In production, set `VITE_API_BASE_URL` to your backend Render URL
 
-### Utility
+## API Summary
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/logout`
+- `GET /api/auth/me`
+- `POST /api/events/track`
+- `GET /api/analytics/overview`
+- `GET /api/analytics/users`
+- `GET /api/analytics/events`
+- `GET /api/analytics/export`
+- `GET /api/admin/users`
 - `GET /api/health`
-
-## Example API Responses
-
-### `POST /api/login`
-```json
-{
-  "message": "Login successful.",
-  "access_token": "jwt-token",
-  "user": {
-    "id": 1,
-    "username": "alice"
-  }
-}
-```
-
-### `GET /api/stats`
-```json
-{
-  "total_users": 5,
-  "total_logins": 18,
-  "total_visits": 24,
-  "recent_activity": [
-    { "label": "Apr 01", "value": 2 }
-  ],
-  "charts": {
-    "activity": {
-      "labels": ["Apr 01"],
-      "values": [2]
-    },
-    "login_frequency": {
-      "labels": ["Apr 01"],
-      "values": [1]
-    }
-  },
-  "insights": {
-    "most_active_user": "alice",
-    "most_active_count": 7,
-    "peak_login_time": "6:00 PM"
-  },
-  "recent_logs": []
-}
-```
 
 ## Postman Documentation
 - Import [docs/postman_collection.json](/Users/surya/portfolio/user-engagement-tracker/docs/postman_collection.json) into Postman.
 - Set `base_url`, `token`, and `user_id` collection variables.
 
-## Testing
-Run:
+## Diagnostics
+
+Frontend build:
 ```bash
-pytest
+npm run build
 ```
 
-Current tests cover:
-- user registration
-- login success and failure
-- protected user endpoints
-- CRUD flow
-- stats payload shape
+Backend smoke test:
+```bash
+cd backend
+npm run test:smoke
+```
 
-## Deployment on Render
-- Runtime: Python
-- Build command: `pip install -r requirements.txt`
-- Start command: `gunicorn app:app`
-- Health check: `/api/health`
+## Render Deployment
 
-Use the included [render.yaml](/Users/surya/portfolio/user-engagement-tracker/render.yaml) to create the web service.
+Use [`render.fullstack.yaml`](/Users/surya/portfolio/user-engagement-tracker/render.fullstack.yaml) for the active React + Express stack:
 
-## Academic Review Notes
-- SQLAlchemy is used for ORM-based database access
-- JWT secures the JSON API
-- Passwords are stored as bcrypt hashes, not plaintext
-- Client pages use fetch + local state with JWT stored in `localStorage`
-- Dashboard and user management views demonstrate full-stack integration
+- Backend: Render web service from `backend/`
+- Frontend: Render static site from `frontend/`
+- Set backend `CLIENT_URL` to the frontend Render URL
+- Set frontend `VITE_API_BASE_URL` to the backend Render URL plus `/api`
+
+The older [`render.yaml`](/Users/surya/portfolio/user-engagement-tracker/render.yaml) is for the legacy Flask app and should not be used for the React + Express deployment.

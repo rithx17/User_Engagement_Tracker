@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+import { API_BASE_URL } from '../config/api';
 
 function getToken() {
   return localStorage.getItem('token');
@@ -17,13 +17,13 @@ async function request(path, options = {}) {
 
   let response;
   try {
-    response = await fetch(`${API_BASE}${path}`, {
+    response = await fetch(`${API_BASE_URL}${path}`, {
       credentials: 'include',
       ...options,
       headers
     });
-  } catch (error) {
-    throw new Error(`Network error: cannot reach API at ${API_BASE}. Check backend server and CORS.`);
+  } catch {
+    throw new Error(`Network error: cannot reach API at ${API_BASE_URL}. Check backend server and CORS.`);
   }
 
   const isJson = response.headers.get('content-type')?.includes('application/json');
@@ -45,12 +45,12 @@ export const api = {
     let response;
 
     try {
-      response = await fetch(`${API_BASE}${path}`, {
+      response = await fetch(`${API_BASE_URL}${path}`, {
         credentials: 'include',
         headers: token ? { Authorization: `Bearer ${token}` } : {}
       });
     } catch {
-      throw new Error(`Network error: cannot reach API at ${API_BASE}. Check backend server and CORS.`);
+      throw new Error(`Network error: cannot reach API at ${API_BASE_URL}. Check backend server and CORS.`);
     }
 
     if (!response.ok) {
