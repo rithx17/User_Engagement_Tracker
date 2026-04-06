@@ -12,10 +12,6 @@ services:
       - key: JWT_SECRET_KEY
         sync: false
       - key: DATABASE_PATH
-        value: /var/data/database.db
+        value: /tmp/database.db
       - key: COOKIE_SECURE
         value: true
-    disks:
-      - name: sqlite-data
-        mountPath: /var/data
-        sizeGB: 1

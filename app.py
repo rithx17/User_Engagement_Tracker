@@ -224,7 +224,7 @@ def register_user(username, password):
         db.session.rollback()
         app.logger.exception("Failed to register user '%s': %s", normalized_username, error)
         raise APIError(
-            "Database write failed. If this is deployed on Render, set DATABASE_PATH to /var/data/database.db and attach a disk.",
+            "Database write failed. On Render free tier, set DATABASE_PATH to /tmp/database.db. For persistent storage, use /var/data/database.db with an attached disk.",
             500,
         ) from error
     create_log_entry(user, "user registration")
