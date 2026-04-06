@@ -8,27 +8,29 @@
 <main class="auth-layout">
     <section class="auth-copy">
         <div class="eyebrow">NEW ACCOUNT</div>
-        <h1>Set up a cleaner admin entry point for your team.</h1>
+        <h1>Create a full-stack analytics admin account.</h1>
         <p>
-            Create a profile and start from a sharper interface that feels
-            closer to a real product dashboard than a starter template.
+            Register a user that can authenticate through the UI and the JWT-secured API,
+            then continue into the analytics dashboard and CRUD management tools.
         </p>
     </section>
 
     <section class="auth-card">
         <div class="card-heading">
             <h2>User Registration</h2>
-            <p>Create your account to begin tracking engagement.</p>
+            <p>Create a new user with validated credentials and hashed passwords.</p>
         </div>
 
-        <form method="post" class="auth-form">
+        <form method="post" class="auth-form" data-auth-form="register">
             <label for="username">Username</label>
             <input id="username" type="text" name="username" placeholder="Choose a username" required>
 
             <label for="password">Password</label>
             <input id="password" type="password" name="password" placeholder="Create a password" required>
 
-            <button class="button button-primary button-block" type="submit">Register</button>
+            <button class="button button-primary button-block" type="submit" data-submit-label="Register">
+                <span>Register</span>
+            </button>
         </form>
 
         <p class="form-footnote">
@@ -37,4 +39,8 @@
         </p>
     </section>
 </main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='auth.js') }}"></script>
 {% endblock %}

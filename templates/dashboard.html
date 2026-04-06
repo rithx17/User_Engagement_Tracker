@@ -6,102 +6,98 @@
 
 {% block content %}
 <main class="dashboard-layout">
-    <section class="dashboard-shell dashboard-hero">
+    <section class="dashboard-shell topbar">
         <div>
-            <div class="eyebrow">PRODUCTION ANALYTICS DASHBOARD</div>
-            <h1>Welcome back, {{ user }}.</h1>
-            <p>
-                Your engagement workspace is live with database-backed logs, auto-refreshing
-                charts, real activity summaries, and session-protected analytics.
-            </p>
+            <div class="eyebrow">FULL-STACK ANALYTICS DASHBOARD</div>
+            <h1>Engagement intelligence at a glance.</h1>
         </div>
 
-        <div class="hero-actions dashboard-actions">
-            <div class="live-status" id="liveStatus">Live sync</div>
-            <a class="button button-secondary" href="{{ url_for('api_stats') }}">Open Stats API</a>
-            <a class="button button-primary" href="{{ url_for('logout') }}">Logout</a>
-        </div>
+        <nav class="topbar-actions">
+            <a class="button button-secondary" href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a class="button button-secondary" href="{{ url_for('user_management') }}">User Management</a>
+            <button class="button button-primary" type="button" data-logout-button>Logout</button>
+        </nav>
     </section>
 
     <section class="dashboard-grid">
         <article class="stat-card stat-card-accent">
             <div class="stat-icon" aria-hidden="true">👥</div>
             <span class="stat-label">Total Users</span>
-            <strong id="stat-total-users">{{ dashboard_data.stats.total_users }}</strong>
-            <p>Registered accounts currently available in the SQLite analytics store.</p>
+            <strong id="statTotalUsers">{{ bootstrap.stats.total_users }}</strong>
+            <p>All registered users currently stored in the SQLAlchemy-backed SQLite database.</p>
         </article>
 
         <article class="stat-card">
             <div class="stat-icon" aria-hidden="true">🔐</div>
             <span class="stat-label">Total Logins</span>
-            <strong id="stat-total-logins">{{ dashboard_data.stats.total_logins }}</strong>
-            <p>Successful sign-ins captured through event logging and session-aware auth.</p>
+            <strong id="statTotalLogins">{{ bootstrap.stats.total_logins }}</strong>
+            <p>Successful sign-ins recorded via login events across the authenticated app flow.</p>
         </article>
 
         <article class="stat-card">
             <div class="stat-icon" aria-hidden="true">📊</div>
             <span class="stat-label">Total Visits</span>
-            <strong id="stat-total-visits">{{ dashboard_data.stats.total_visits }}</strong>
-            <p>Protected dashboard visits tracked for product usage and retention visibility.</p>
+            <strong id="statTotalVisits">{{ bootstrap.stats.total_visits }}</strong>
+            <p>Dashboard visits tracked in the audit log for engagement review and demos.</p>
         </article>
     </section>
 
-    <section class="dashboard-content-grid">
-        <article class="dashboard-panel analytics-panel">
+    <section class="dashboard-grid dashboard-grid-two">
+        <article class="dashboard-panel">
             <div class="panel-header">
                 <div>
-                    <span class="eyebrow">RECENT ACTIVITY</span>
-                    <h2>User activity over time</h2>
+                    <span class="eyebrow">ACTIVITY TREND</span>
+                    <h2>Line chart</h2>
+                </div>
+                <div class="live-pill" id="statsSyncState">Live sync</div>
+            </div>
+
+            <div class="chart-wrap">
+                <canvas id="activityChart" aria-label="Activity over time chart"></canvas>
+                <div class="chart-loader" id="activityLoader">Refreshing…</div>
+            </div>
+        </article>
+
+        <article class="dashboard-panel">
+            <div class="panel-header">
+                <div>
+                    <span class="eyebrow">LOGIN FREQUENCY</span>
+                    <h2>Bar chart</h2>
                 </div>
                 <span class="badge badge-muted">Last 7 days</span>
             </div>
 
             <div class="chart-wrap">
-                <canvas id="activityChart" aria-label="User activity line chart"></canvas>
-                <div class="chart-loader" id="activityLoader">Refreshing chart…</div>
-            </div>
-        </article>
-
-        <article class="dashboard-panel analytics-panel">
-            <div class="panel-header">
-                <div>
-                    <span class="eyebrow">LOGIN FREQUENCY</span>
-                    <h2>Login trend by day</h2>
-                </div>
-                <span class="badge badge-muted">Behavior snapshot</span>
-            </div>
-
-            <div class="chart-wrap">
-                <canvas id="loginChart" aria-label="Login frequency bar chart"></canvas>
-                <div class="chart-loader" id="loginLoader">Refreshing chart…</div>
+                <canvas id="loginChart" aria-label="Login frequency chart"></canvas>
+                <div class="chart-loader" id="loginLoader">Refreshing…</div>
             </div>
         </article>
     </section>
 
-    <section class="dashboard-content-grid">
-        <article class="dashboard-panel insights-panel">
+    <section class="dashboard-grid dashboard-grid-two">
+        <article class="dashboard-panel">
             <div class="panel-header">
                 <div>
                     <span class="eyebrow">INSIGHTS</span>
-                    <h2>High-level signals</h2>
+                    <h2>Review highlights</h2>
                 </div>
             </div>
 
             <div class="insights-grid">
                 <div class="insight-card">
                     <span class="insight-label">Most Active User</span>
-                    <strong id="insight-most-active">{{ dashboard_data.insights.most_active_user }}</strong>
-                    <p id="insight-most-active-count">{{ dashboard_data.insights.most_active_count }} tracked actions</p>
+                    <strong id="mostActiveUser">{{ bootstrap.stats.insights.most_active_user }}</strong>
+                    <p id="mostActiveCount">{{ bootstrap.stats.insights.most_active_count }} tracked actions</p>
                 </div>
                 <div class="insight-card">
                     <span class="insight-label">Peak Login Time</span>
-                    <strong id="insight-peak-login">{{ dashboard_data.insights.peak_login_time }}</strong>
-                    <p>Approximate hour with the strongest login activity.</p>
+                    <strong id="peakLoginTime">{{ bootstrap.stats.insights.peak_login_time }}</strong>
+                    <p>Approximate hour with the highest login concentration.</p>
                 </div>
             </div>
         </article>
 
-        <article class="dashboard-panel recent-panel">
+        <article class="dashboard-panel">
             <div class="panel-header">
                 <div>
                     <span class="eyebrow">RECENT ACTIVITY</span>
@@ -109,8 +105,8 @@
                 </div>
             </div>
 
-            <div class="activity-feed" id="recentActivityFeed">
-                {% for item in dashboard_data.stats.recent_activity %}
+            <div class="activity-feed" id="recentActivityList">
+                {% for item in bootstrap.stats.recent_activity %}
                     <div class="activity-feed-row">
                         <span>{{ item.label }}</span>
                         <strong>{{ item.value }} actions</strong>
@@ -120,12 +116,18 @@
         </article>
     </section>
 
-    <section class="dashboard-panel logs-panel">
+    <section class="dashboard-panel">
         <div class="panel-header">
             <div>
-                <span class="eyebrow">ACTIVITY LOG TABLE</span>
-                <h2>Latest 10 events</h2>
+                <span class="eyebrow">ACTIVITY LOGS</span>
+                <h2>Recent audit trail</h2>
             </div>
+
+            <form class="filter-row" id="logFilters">
+                <input type="date" name="start_date" id="logStartDate">
+                <input type="date" name="end_date" id="logEndDate">
+                <button class="button button-secondary" type="submit">Apply filter</button>
+            </form>
         </div>
 
         <div class="table-wrap">
@@ -138,21 +140,21 @@
                     </tr>
                 </thead>
                 <tbody id="logsTableBody">
-                    {% if dashboard_data.recent_logs %}
-                        {% for log in dashboard_data.recent_logs %}
-                            <tr>
-                                <td>{{ log.username }}</td>
-                                <td><span class="table-pill">{{ log.action }}</span></td>
-                                <td>{{ log.timestamp }}</td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
+                    {% for log in bootstrap.stats.recent_logs %}
                         <tr>
-                            <td colspan="3" class="empty-state">No activity has been logged yet.</td>
+                            <td>{{ log.username }}</td>
+                            <td><span class="table-pill">{{ log.action }}</span></td>
+                            <td>{{ log.timestamp }}</td>
                         </tr>
-                    {% endif %}
+                    {% endfor %}
                 </tbody>
             </table>
+        </div>
+
+        <div class="pagination-row">
+            <button class="button button-secondary" type="button" id="logsPrevButton">Previous</button>
+            <span id="logsPaginationLabel">Page 1</span>
+            <button class="button button-secondary" type="button" id="logsNextButton">Next</button>
         </div>
     </section>
 </main>
@@ -160,6 +162,6 @@
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script id="dashboardBootstrap" type="application/json">{{ dashboard_data | tojson }}</script>
+<script id="dashboardBootstrap" type="application/json">{{ bootstrap | tojson }}</script>
 <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
 {% endblock %}

@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block head %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
     <div class="page-shell">
@@ -24,9 +25,12 @@
             {% endif %}
         {% endwith %}
 
+        <div id="toastRack" class="toast-rack" aria-live="polite" aria-atomic="true"></div>
+
         {% block content %}{% endblock %}
     </div>
 
+    <script src="{{ url_for('static', filename='common.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

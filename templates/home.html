@@ -7,66 +7,62 @@
 {% block content %}
 <main class="hero-layout">
     <section class="hero-panel">
-        <div class="eyebrow">ENGAGEMENT ANALYTICS PLATFORM</div>
-        <h1>
-            Measure user activity with a dashboard that feels built for teams,
-            not templates.
-        </h1>
+        <div class="eyebrow">ACADEMIC-READY FULL-STACK SYSTEM</div>
+        <h1>Build, review, and present engagement analytics with confidence.</h1>
         <p class="hero-copy">
-            User Engagement Tracker helps you keep onboarding, login activity,
-            and session visibility in one focused workspace with a cleaner,
-            more credible interface.
+            User Engagement Tracker now combines a Flask REST API, JWT authentication,
+            CRUD workflows, SQLite analytics, modern dashboards, and deployment-ready structure
+            in one review-friendly codebase.
         </p>
 
         <div class="hero-actions">
-            <a class="button button-primary" href="{{ url_for('register') }}">Create account</a>
-            <a class="button button-secondary" href="{{ url_for('login') }}">Sign in</a>
+            {% if session_user %}
+                <a class="button button-primary" href="{{ url_for('dashboard') }}">Open dashboard</a>
+                <a class="button button-secondary" href="{{ url_for('user_management') }}">Manage users</a>
+            {% else %}
+                <a class="button button-primary" href="{{ url_for('register') }}">Create account</a>
+                <a class="button button-secondary" href="{{ url_for('login') }}">Sign in</a>
+            {% endif %}
         </div>
 
         <div class="metric-strip">
             <article>
-                <strong>Focused UX</strong>
-                <span>Editorial layout, layered surfaces, and stronger typography.</span>
+                <strong>JWT-secured APIs</strong>
+                <span>REST endpoints for auth, users, logs, and analytics with structured JSON responses.</span>
             </article>
             <article>
-                <strong>Fast onboarding</strong>
-                <span>Register, login, and land in a dashboard with less friction.</span>
+                <strong>Interactive dashboard</strong>
+                <span>Chart.js visualizations, recent activity, insights, filters, and responsive layouts.</span>
             </article>
             <article>
-                <strong>Ready to evolve</strong>
-                <span>A reusable base template and shared design system.</span>
+                <strong>Review-ready project</strong>
+                <span>Testing, CI workflow, documentation, Render compatibility, and cleaner structure.</span>
             </article>
         </div>
     </section>
 
     <aside class="showcase-card">
         <div class="showcase-header">
-            <span class="badge">Live workspace</span>
-            <span class="badge badge-muted">Modernized UI</span>
-        </div>
-
-        <div class="showcase-graph">
-            <div class="graph-line"></div>
-            <div class="graph-points">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+            <span class="badge">Flask + SQLite</span>
+            <span class="badge badge-muted">JWT + CRUD + Charts</span>
         </div>
 
         <div class="showcase-list">
             <div>
-                <span>Session visibility</span>
-                <strong>Structured dashboard</strong>
+                <span>Authentication</span>
+                <strong>Session-backed pages and JWT-protected APIs</strong>
             </div>
             <div>
-                <span>Authentication views</span>
-                <strong>Unified visual language</strong>
+                <span>Data model</span>
+                <strong>SQLAlchemy ORM for users and engagement logs</strong>
             </div>
             <div>
-                <span>Frontend direction</span>
-                <strong>Professional, not generic</strong>
+                <span>Admin capability</span>
+                <strong>User management with search, edit, delete, and pagination</strong>
+            </div>
+            <div>
+                <span>Analytics layer</span>
+                <strong>Totals, time-series charts, filters, and recent audit activity</strong>
             </div>
         </div>
     </aside>

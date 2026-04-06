@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}User Management | User Engagement Tracker{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block content %}
+<main class="dashboard-layout">
+    <section class="dashboard-shell topbar">
+        <div>
+            <div class="eyebrow">CRUD ADMIN PANEL</div>
+            <h1>Manage application users.</h1>
+        </div>
+
+        <nav class="topbar-actions">
+            <a class="button button-secondary" href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a class="button button-secondary" href="{{ url_for('user_management') }}">User Management</a>
+            <button class="button button-primary" type="button" data-logout-button>Logout</button>
+        </nav>
+    </section>
+
+    <section class="dashboard-grid dashboard-grid-two">
+        <article class="dashboard-panel">
+            <div class="panel-header">
+                <div>
+                    <span class="eyebrow">CREATE OR UPDATE</span>
+                    <h2>User form</h2>
+                </div>
+            </div>
+
+            <form class="auth-form compact-form" id="userForm">
+                <input type="hidden" id="userId">
+
+                <label for="userUsername">Username</label>
+                <input id="userUsername" type="text" name="username" placeholder="Enter username" required>
+
+                <label for="userPassword">Password</label>
+                <input id="userPassword" type="password" name="password" placeholder="Enter password">
+
+                <div class="form-actions">
+                    <button class="button button-primary" type="submit" id="userSubmitButton">Create user</button>
+                    <button class="button button-secondary" type="button" id="userCancelButton">Clear</button>
+                </div>
+            </form>
+        </article>
+
+        <article class="dashboard-panel">
+            <div class="panel-header">
+                <div>
+                    <span class="eyebrow">SEARCH</span>
+                    <h2>User lookup</h2>
+                </div>
+            </div>
+
+            <form class="filter-row" id="userSearchForm">
+                <input type="search" id="userSearchInput" placeholder="Search users by username">
+                <button class="button button-secondary" type="submit">Search</button>
+            </form>
+
+            <div class="activity-feed">
+                <div class="activity-feed-row">
+                    <span>Total users on current page</span>
+                    <strong id="usersPageCount">{{ bootstrap.users | length }}</strong>
+                </div>
+                <div class="activity-feed-row">
+                    <span>Pagination status</span>
+                    <strong id="usersPaginationLabel">Page {{ bootstrap.pagination.page }} of {{ bootstrap.pagination.pages }}</strong>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <section class="dashboard-panel">
+        <div class="panel-header">
+            <div>
+                <span class="eyebrow">USER TABLE</span>
+                <h2>All users</h2>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table class="logs-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    {% for user in bootstrap.users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.username }}</td>
+                            <td class="table-actions">
+                                <button class="button button-secondary" type="button" data-edit-user="{{ user.id }}" data-username="{{ user.username }}">Edit</button>
+                                <button class="button button-secondary" type="button" data-delete-user="{{ user.id }}" data-username="{{ user.username }}">Delete</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination-row">
+            <button class="button button-secondary" type="button" id="usersPrevButton">Previous</button>
+            <span id="usersTablePaginationLabel">Page {{ bootstrap.pagination.page }}</span>
+            <button class="button button-secondary" type="button" id="usersNextButton">Next</button>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script id="usersBootstrap" type="application/json">{{ bootstrap | tojson }}</script>
+<script src="{{ url_for('static', filename='users.js') }}"></script>
+{% endblock %}

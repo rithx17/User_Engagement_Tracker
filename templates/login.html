@@ -7,28 +7,30 @@
 {% block content %}
 <main class="auth-layout">
     <section class="auth-copy">
-        <div class="eyebrow">WELCOME BACK</div>
-        <h1>Access your engagement workspace.</h1>
+        <div class="eyebrow">SECURE ACCESS</div>
+        <h1>Sign in to the analytics workspace.</h1>
         <p>
-            Sign in to review user activity with a calmer, more product-ready
-            interface built to feel trustworthy from the first click.
+            Log in with the same credentials used by the REST API and keep your
+            browser session synchronized with JWT-powered frontend requests.
         </p>
     </section>
 
     <section class="auth-card">
         <div class="card-heading">
             <h2>User Login</h2>
-            <p>Enter your credentials to continue.</p>
+            <p>Access dashboards, logs, and user management from one admin view.</p>
         </div>
 
-        <form method="post" class="auth-form">
+        <form method="post" class="auth-form" data-auth-form="login">
             <label for="username">Username</label>
             <input id="username" type="text" name="username" placeholder="Enter your username" required>
 
             <label for="password">Password</label>
             <input id="password" type="password" name="password" placeholder="Enter your password" required>
 
-            <button class="button button-primary button-block" type="submit">Login</button>
+            <button class="button button-primary button-block" type="submit" data-submit-label="Login">
+                <span>Login</span>
+            </button>
         </form>
 
         <p class="form-footnote">
@@ -37,4 +39,8 @@
         </p>
     </section>
 </main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='auth.js') }}"></script>
 {% endblock %}

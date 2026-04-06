@@ -1,141 +1,175 @@
 # User Engagement Tracker
 
-Full-stack engagement analytics platform with authentication, event tracking, and an interactive dashboard.
+User Engagement Tracker is a Flask-based full-stack analytics system built for academic review and deployment demos. It combines REST APIs, JWT authentication, CRUD operations, SQLite analytics, responsive dashboards, and documentation in a single Render-ready project.
 
-## Final Shareable URLs
-- Local production-style: `http://localhost:8080`
-- Local dev: `http://localhost:5173`
+## Live URL
+- Expected Render URL: `https://user-engagement-tracker.onrender.com`
+- Health check: `https://user-engagement-tracker.onrender.com/api/health`
 
-For public users, deploy backend + frontend (Render + Vercel) and share your Vercel domain.
+## Tech Stack
+- Backend: Flask, SQLAlchemy ORM, Flask-JWT-Extended, Flask-Bcrypt
+- Frontend: Jinja templates, vanilla JavaScript, Chart.js, custom CSS
+- Database: SQLite
+- Testing: Pytest
+- Deployment: Render
+- CI: GitHub Actions
 
-## Stack
-- Frontend: React + Vite + TailwindCSS + Recharts
-- Backend: Node.js + Express
-- Database: MongoDB
-- Auth: JWT + password hashing
+## Features
+- JWT-based authentication for REST APIs
+- Session-backed server-rendered pages for dashboard navigation
+- Password hashing with bcrypt
+- Full CRUD for users
+- Activity logging with analytics insights
+- Search, pagination, and log date filtering
+- Chart.js dashboard with line and bar charts
+- Secure headers, validation, and structured error handling
+- Postman collection for API review
 
-## API Endpoints
-- POST `/api/auth/login`
-- POST `/api/auth/register`
-- POST `/api/auth/logout`
-- GET `/api/auth/me`
-- POST `/api/events/track`
-- GET `/api/analytics/overview`
-- GET `/api/analytics/events`
-- GET `/api/analytics/users` (admin)
-- GET `/api/analytics/export` (admin)
-- GET `/api/admin/users` (admin)
+## Project Structure
+```text
+user-engagement-tracker/
+├── app.py
+├── database.db
+├── requirements.txt
+├── render.yaml
+├── templates/
+│   ├── base.html
+│   ├── home.html
+│   ├── login.html
+│   ├── register.html
+│   ├── dashboard.html
+│   └── user_management.html
+├── static/
+│   ├── auth.js
+│   ├── common.js
+│   ├── dashboard.js
+│   ├── users.js
+│   └── style.css
+├── tests/
+│   └── test_app.py
+├── docs/
+│   └── postman_collection.json
+└── .github/workflows/python-ci.yml
+```
+
+## Setup
+1. Create and activate a virtual environment.
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Copy environment variables:
+   ```bash
+   cp .env.example .env
+   ```
+4. Run the app locally:
+   ```bash
+   gunicorn app:app
+   ```
+   Or for development:
+   ```bash
+   python app.py
+   ```
 
 ## Environment Variables
-Backend (`backend/.env`):
-- `NODE_ENV=development`
-- `HOST=127.0.0.1`
-- `PORT=5050`
-- `MONGO_URI=mongodb://127.0.0.1:27017/engagement_tracker`
-- `JWT_SECRET=replace_with_strong_secret`
-- `JWT_EXPIRES_IN=7d`
-- `CLIENT_URL=http://localhost:5173`
-- `COOKIE_SECURE=false`
-- `USE_INMEMORY_DB=true|false` (`true` uses a local JSON datastore at `backend/.data/dev-db.json`)
-- `AUTO_DEMO_SEED=true|false`
+- `SECRET_KEY`: Flask session secret
+- `JWT_SECRET_KEY`: JWT signing secret
+- `DATABASE_PATH`: SQLite path, defaults to `database.db`
+- `PORT`: Flask/Gunicorn port
+- `COOKIE_SECURE`: `true` in production behind HTTPS
 
-Frontend (`frontend/.env`):
-- `VITE_API_BASE_URL=http://localhost:5050/api`
+## REST API Endpoints
 
-## Run (Recommended: Docker)
-```bash
-cd /Users/surya/portfolio/user-engagement-tracker
-docker compose up --build -d
+### Auth
+- `POST /api/register`
+- `POST /api/login`
+
+### Users
+- `GET /api/users`
+- `GET /api/users/<id>`
+- `PUT /api/users/<id>`
+- `DELETE /api/users/<id>`
+
+### Logs
+- `GET /api/logs`
+- `POST /api/logs`
+
+### Stats
+- `GET /api/stats`
+
+### Utility
+- `GET /api/health`
+
+## Example API Responses
+
+### `POST /api/login`
+```json
+{
+  "message": "Login successful.",
+  "access_token": "jwt-token",
+  "user": {
+    "id": 1,
+    "username": "alice"
+  }
+}
 ```
 
-Open:
-- `http://localhost:8080`
-
-Stop:
-```bash
-docker compose down
+### `GET /api/stats`
+```json
+{
+  "total_users": 5,
+  "total_logins": 18,
+  "total_visits": 24,
+  "recent_activity": [
+    { "label": "Apr 01", "value": 2 }
+  ],
+  "charts": {
+    "activity": {
+      "labels": ["Apr 01"],
+      "values": [2]
+    },
+    "login_frequency": {
+      "labels": ["Apr 01"],
+      "values": [1]
+    }
+  },
+  "insights": {
+    "most_active_user": "alice",
+    "most_active_count": 7,
+    "peak_login_time": "6:00 PM"
+  },
+  "recent_logs": []
+}
 ```
 
-## Run (Local Dev)
-1. Copy env files:
+## Postman Documentation
+- Import [docs/postman_collection.json](/Users/surya/portfolio/user-engagement-tracker/docs/postman_collection.json) into Postman.
+- Set `base_url`, `token`, and `user_id` collection variables.
+
+## Testing
+Run:
 ```bash
-cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
+pytest
 ```
 
-2. Start MongoDB only if you disable the local dev datastore:
-```bash
-docker compose up -d mongodb
-```
+Current tests cover:
+- user registration
+- login success and failure
+- protected user endpoints
+- CRUD flow
+- stats payload shape
 
-3. Backend:
-```bash
-cd backend
-npm install
-npm run dev
-```
+## Deployment on Render
+- Runtime: Python
+- Build command: `pip install -r requirements.txt`
+- Start command: `gunicorn app:app`
+- Health check: `/api/health`
 
-4. Frontend (new terminal):
-```bash
-cd frontend
-npm install
-npm run dev -- --host localhost --port 5173
-```
+Use the included [render.yaml](/Users/surya/portfolio/user-engagement-tracker/render.yaml) to create the web service.
 
-Open:
-- `http://localhost:5173`
-
-Optional smoke test:
-```bash
-cd backend
-npm run test:smoke
-```
-
-## Demo Seed
-```bash
-curl -X POST http://localhost:5050/api/dev/seed
-curl -X POST http://localhost:5050/api/dev/reset-admin
-```
-
-Demo admin credentials:
-- `admin@example.com`
-- `password123`
-
-## Public Deployment (Render + Vercel)
-
-### 1. Backend on Render
-Repository includes: [render.yaml](/Users/surya/portfolio/user-engagement-tracker/render.yaml)
-
-Steps:
-1. Push this project to GitHub.
-2. In Render, create a new Blueprint deployment from repo root.
-3. Set required env values in Render:
-   - `MONGO_URI` = your MongoDB Atlas URI
-   - `JWT_SECRET` = strong random secret
-   - `CLIENT_URL` = your Vercel domain (e.g. `https://your-app.vercel.app`)
-4. Deploy service `user-engagement-backend`.
-
-Expected backend URL example:
-- `https://user-engagement-backend.onrender.com`
-
-Health URL:
-- `https://user-engagement-backend.onrender.com/api/health`
-
-### 2. Frontend on Vercel
-Use the repo root as the Vercel project source so `vercel.json` can build `frontend/` and rewrite SPA routes correctly.
-
-Set env var in Vercel:
-- `VITE_API_BASE_URL=https://user-engagement-backend.onrender.com/api`
-
-(Template available at `frontend/.env.production.example`.)
-
-Expected frontend URL example:
-- `https://user-engagement-tracker.vercel.app`
-
-### 3. Final public URL to share
-- Your Vercel app URL, e.g. `https://user-engagement-tracker.vercel.app`
-
-## Production Notes
-- Disable dev-only behavior with `NODE_ENV=production`.
-- Keep `AUTO_DEMO_SEED=false` in production.
-- Use `COOKIE_SECURE=true` behind HTTPS.
+## Academic Review Notes
+- SQLAlchemy is used for ORM-based database access
+- JWT secures the JSON API
+- Passwords are stored as bcrypt hashes, not plaintext
+- Client pages use fetch + local state with JWT stored in `localStorage`
+- Dashboard and user management views demonstrate full-stack integration
